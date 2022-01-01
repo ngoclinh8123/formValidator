@@ -27,7 +27,9 @@ function Validator(options) {
       switch (inputElement.type) {
         case "checkbox":
         case "radio":
-          errorMessage = rules[i](inputElement.value);
+          errorMessage = rules[i](
+            formElement.querySelector(rule.selector + ":checked")
+          );
           break;
         default:
           errorMessage = rules[i](inputElement.value);
@@ -62,6 +64,7 @@ function Validator(options) {
       //lap qua tung rule va kiem tra
       options.rules.forEach(function (rule) {
         var inputElement = formElement.querySelector(rule.selector);
+
         var isValid = validate(inputElement, rule);
 
         if (!isValid) {
@@ -77,7 +80,32 @@ function Validator(options) {
             values,
             input
           ) {
-            values[input.name] = input.value;
+            switch (input.type) {
+              case "checkbox":
+                if (!input.matches(":checked")) {
+                  values[input.name] = "";
+                  return values;
+                }
+                if (!Array.isArray(values[input.name])) {
+                  values[input.name] = [];
+                }
+
+                values[input.name].push(input.value);
+                break;
+              case "radio":
+                values[input.name] = formElement.querySelector(
+                  'input[name="' + input.name + '"]:checked'
+                ).value;
+                break;
+
+              case "file":
+                values[input.name] = input.files;
+                break;
+
+              default:
+                values[input.name] = input.value;
+            }
+
             return values;
           },
           {});
@@ -101,26 +129,28 @@ function Validator(options) {
         selectorRules[rule.selector] = [rule.test];
       }
 
-      var inputElement = formElement.querySelector(rule.selector);
+      var inputElements = formElement.querySelectorAll(rule.selector);
 
-      if (inputElement) {
-        //khi blur khoi input
-        inputElement.onblur = function () {
-          validate(inputElement, rule);
-        };
+      Array.from(inputElements).forEach(function (inputElement) {
+        if (inputElement) {
+          //khi blur khoi input
+          inputElement.onblur = function () {
+            validate(inputElement, rule);
+          };
 
-        //khi nguoi dung nhap
-        inputElement.oninput = function () {
-          var errorElement = getParent(
-            inputElement,
-            options.formGroupSelector
-          ).querySelector(options.errorSelector);
-          errorElement.innerText = "";
-          getParent(inputElement, options.formGroupSelector).classList.remove(
-            "invalid"
-          );
-        };
-      }
+          //khi nguoi dung nhap
+          inputElement.oninput = function () {
+            var errorElement = getParent(
+              inputElement,
+              options.formGroupSelector
+            ).querySelector(options.errorSelector);
+            errorElement.innerText = "";
+            getParent(inputElement, options.formGroupSelector).classList.remove(
+              "invalid"
+            );
+          };
+        }
+      });
     });
   }
 }
@@ -133,7 +163,7 @@ Validator.isRequired = function (selector, message) {
   return {
     selector: selector,
     test: function (value) {
-      return value.trim() ? undefined : message || "Vui lòng nhập trường này ";
+      return value ? undefined : message || "Vui lòng nhập trường này ";
     },
   };
 };

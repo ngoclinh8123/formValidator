@@ -87,10 +87,52 @@
           />Other
           <span class="form-message"></span>
         </div>
+        <div class="form-group">
+          <label for="avatar" class="form-label">Choose your avatar</label>
+          <input id="avatar" name="avatar" type="file" class="form-control" />
+          <span class="form-message"></span>
+        </div>
+        <div class="form-group">
+          <label for="language" class="form-label">Choose your language</label>
+          <input
+            type="checkbox"
+            name="language"
+            value="java"
+            class="form-control"
+          />Java
+          <input
+            type="checkbox"
+            name="language"
+            value="python"
+            class="form-control"
+          />Python
+          <input
+            type="checkbox"
+            name="language"
+            value="ruby"
+            class="form-control"
+          />Ruby
+          <span class="form-message"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="province" class="form-label"></label>
+          <select name="province" id="province">
+            <option value="">
+              ---------------------Chọn tỉnh--------------------
+            </option>
+            <option value="hanoi">Hà Nội</option>
+            <option value="dalat">Đà Lạt</option>
+            <option value="sapa">Sapa</option>
+            <option value="namdinh">Nam Định</option>
+          </select>
+          <span class="form-message"></span>
+        </div>
 
         <button class="form-submit">Đăng ký</button>
       </form>
     </div>
+
     <script src="./app.js"></script>
     <script>
       Validator({
@@ -109,7 +151,10 @@
             },
             "Mật khẩu nhập lại không chính xác"
           ),
-          Validator.isRequired('input[name="gender"]'),
+          Validator.isRequired('input[name = "gender"]'),
+          Validator.isRequired('input[name = "language"]'),
+          Validator.isRequired("#province"),
+          Validator.isRequired("#avatar"),
         ],
         onSubmit: function (data) {
           console.log(data);
